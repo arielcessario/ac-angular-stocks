@@ -26,15 +26,15 @@ $decoded = json_decode($data);
 if ($jwt_enabled) {
 
     // Las funciones en el if no necesitan usuario logged
-    if (($decoded == null) && (($_GET["function"] != null) &&
-            ($_GET["function"] == 'getPedidos' ||
-                $_GET["function"] == 'getPedidodetalles' ||
-                $_GET["function"] == 'getStocks'))
-    ) {
-        $token = '';
-    } else {
-        checkSecurity();
-    }
+//    if (($decoded == null) && (($_GET["function"] != null) &&
+//            ($_GET["function"] == 'getPedidos' ||
+//                $_GET["function"] == 'getPedidodetalles' ||
+//                $_GET["function"] == 'getStocks'))
+//    ) {
+//        $token = '';
+//    } else {
+    checkSecurity();
+//    }
 
 }
 
@@ -43,32 +43,32 @@ if ($decoded != null) {
     if ($decoded->function == 'createPedido') {
         createPedido($decoded->pedido);
     } else if ($decoded->function == 'createPedidoDetalle') {
-        createPedidoDetalle($decoded->pedidodetalle);
+        createPedidoDetalle($decoded->pedido´_detalle);
     } else if ($decoded->function == 'createStock') {
         createStock($decoded->stock);
     } else if ($decoded->function == 'updatePedido') {
-        updatePedido($decoded->Pedido);
+        updatePedido($decoded->pedido);
     } else if ($decoded->function == 'updatePedidoDetalle') {
-        updatePedidoDetalle($decoded->PedidoDetalle);
-    } else if ($decoded->function == 'updateStockDetalle') {
-        updateStockDetalle($decoded->Stock_detalle);
+        updatePedidoDetalle($decoded->pedido_detalle);
     } else if ($decoded->function == 'updateStock') {
-        updateStock($decoded->Stock);
+        updateStock($decoded->stock);
     } else if ($decoded->function == 'removePedido') {
-        removePedido($decoded->Pedido_id);
+        removePedido($decoded->pedido_id);
     } else if ($decoded->function == 'removePedidoDetalle') {
-        removePedidoDetalle($decoded->PedidoDetalle_id);
+        removePedidoDetalle($decoded->pedido_detalle_id);
     } else if ($decoded->function == 'removeStock') {
-        removeStock($decoded->Stock_id);
+        removeStock($decoded->stock_id);
+    } else if ($decoded->function == 'trasladar') {
+        trasladar($decoded->origen_id, $decoded->destino_id, $decoded->producto_id, $decoded->cantidad);
     }
 } else {
     $function = $_GET["function"];
     if ($function == 'getPedidos') {
         getPedidos();
     } elseif ($function == 'getPedidoDetalles') {
-        getPedidoDetalles();
+        getPedidosDetalles($_GET["pedido_id"]);
     } elseif ($function == 'getStocks') {
-        getStocks($_GET["usuario_id"]);
+        getStocks();
     }
 }
 
@@ -194,6 +194,7 @@ function updatePedido($pedido)
     $data = array(
         'proveedor_id' => $item_decoded->proveedor_id,
         'usuario_id' => $item_decoded->usuario_id,
+        'fecha_entrega' => $item_decoded->fecha_entrega != '0000-00-00 00:00:00' ? $db->now() : $item_decoded->fecha_entrega,
         'total' => $item_decoded->total,
         'iva' => $item_decoded->iva,
         'sucursal_id' => $item_decoded->sucursal_id
@@ -381,7 +382,7 @@ function getPedidos()
     pd.cantidad,
     pd.precio_unidad,
     pd.precio_total,
-    o.nombre nombrProducto
+    o.nombre nombreProducto
 FROM
     pedidos p
         INNER JOIN
@@ -419,165 +420,50 @@ GROUP BY p.pedido_id,
         if (!isset($final[$row["pedido_id"]])) {
             $final[$row["pedido_id"]] = array(
                 'pedido_id' => $row["pedido_id"],
-                'nombre' => $row["nombrePedido"],
-                'descripcion' => $row["descripcion"],
-                'pto_repo' => $row["pto_repo"],
-                'sku' => $row["sku"],
-                'status' => $row["status"],
-                'vendidos' => $row["vendidos"],
-                'destacado' => $row["destacado"],
-                'pedido_tipo' => $row["pedido_tipo"],
-                'en_slider' => $row["en_slider"],
-                'en_oferta' => $row["en_oferta"],
-                'pedidodetalles' => array(),
-                'precios' => array(),
-                'fotos' => array(),
-                'kits' => array(),
-                'proveedores' => array()
+                'proveedor_id' => $row["proveedor_id"],
+                'usuario_id' => $row["usuario_id"],
+                'fecha_pedido' => $row["fecha_pedido"],
+                'fecha_entrega' => $row["fecha_entrega"],
+                'total' => $row["total"],
+                'iva' => $row["iva"],
+                'sucursal_id' => $row["sucursal_id"],
+                'proveedor_nombre' => $row["nombreProveedor"],
+                'proveedor_apellido' => $row["apellidoProveedor"],
+                'usuario_nombre' => $row["nombreUsuario"],
+                'usuario_apellido' => $row["apellidoUsuario"],
+                'pedidos_detalles' => array()
             );
         }
-        $have_cat = false;
-        if ($row["pedidodetalle_id"] !== null) {
+        $have_pde = false;
+        if ($row["pedido_detalle_id"] !== null) {
 
-            if (sizeof($final[$row['pedido_id']]['pedidodetalles']) > 0) {
-                foreach ($final[$row['pedido_id']]['pedidodetalles'] as $cat) {
-                    if ($cat['pedidodetalle_id'] == $row["pedidodetalle_id"]) {
-                        $have_cat = true;
+            if (sizeof($final[$row['pedido_id']]['pedidos_detalles']) > 0) {
+                foreach ($final[$row['pedido_id']]['pedidodetalles'] as $pde) {
+                    if ($pde['pedido_detalle_id'] == $row["pedido_detalle_id"]) {
+                        $have_pde = true;
                     }
                 }
             } else {
-                $final[$row['pedido_id']]['pedidodetalles'][] = array(
-                    'pedidodetalle_id' => $row['pedidodetalle_id'],
+                $final[$row['pedido_id']]['pedidos_detalles'][] = array(
+                    'pedido_detalle_id' => $row['pedido_detalle_id'],
                     'nombre' => $row['nombrePedidodetalle'],
                     'parent_id' => $row['parent_id']
                 );
 
-                $have_cat = true;
+                $have_pde = true;
             }
 
-            if (!$have_cat) {
+            if (!$have_pde) {
                 array_push($final[$row['pedido_id']]['pedidodetalles'], array(
                     'pedidodetalle_id' => $row['pedidodetalle_id'],
-                    'nombre' => $row['nombrePedidodetalle'],
-                    'parent_id' => $row['parent_id']
+                    'cantidad' => $row['cantidad'],
+                    'precio_unidad' => $row['precio_unidad'],
+                    'precio_total' => $row['precio_total'],
+                    'nombre' => $row['nombreProducto']
                 ));
             }
         }
 
-
-        $have_pre = false;
-        if ($row["precio_id"] !== null) {
-
-            if (sizeof($final[$row['pedido_id']]['precios']) > 0) {
-                foreach ($final[$row['pedido_id']]['precios'] as $cat) {
-                    if ($cat['precio_id'] == $row["precio_id"]) {
-                        $have_pre = true;
-                    }
-                }
-            } else {
-                $final[$row['pedido_id']]['precios'][] = array(
-                    'precio_id' => $row['precio_id'],
-                    'precio_tipo_id' => $row['precio_tipo_id'],
-                    'precio' => $row['precio']
-                );
-
-                $have_pre = true;
-            }
-
-            if (!$have_pre) {
-                array_push($final[$row['pedido_id']]['precios'], array(
-                    'precio_id' => $row['precio_id'],
-                    'precio_tipo_id' => $row['precio_tipo_id'],
-                    'precio' => $row['precio']
-                ));
-            }
-        }
-
-
-        $have_fot = false;
-        if ($row["pedido_foto_id"] !== null) {
-
-            if (sizeof($final[$row['pedido_id']]['fotos']) > 0) {
-                foreach ($final[$row['pedido_id']]['fotos'] as $cat) {
-                    if ($cat['pedido_foto_id'] == $row["pedido_foto_id"]) {
-                        $have_fot = true;
-                    }
-                }
-            } else {
-                $final[$row['pedido_id']]['fotos'][] = array(
-                    'pedido_foto_id' => $row['pedido_foto_id'],
-                    'nombre' => $row['nombreFoto'],
-                    'main' => $row['main']
-                );
-
-                $have_fot = true;
-            }
-
-            if (!$have_fot) {
-                array_push($final[$row['pedido_id']]['fotos'], array(
-                    'pedido_foto_id' => $row['pedido_foto_id'],
-                    'nombre' => $row['nombreFoto'],
-                    'main' => $row['main']
-                ));
-            }
-        }
-
-        $have_kit = false;
-        if ($row["pedido_kit_id"] !== null) {
-
-            if (sizeof($final[$row['pedido_id']]['kits']) > 0) {
-                foreach ($final[$row['pedido_id']]['kits'] as $cat) {
-                    if ($cat['pedido_kit_id'] == $row["pedido_kit_id"]) {
-                        $have_kit = true;
-                    }
-                }
-            } else {
-                $final[$row['pedido_id']]['kits'][] = array(
-                    'pedido_kit_id' => $row['pedido_kit_id'],
-                    'pedido_id' => $row['pedidoKit'],
-                    'cantidad' => $row['cantidad']
-                );
-
-                $have_kit = true;
-            }
-
-            if (!$have_kit) {
-                array_push($final[$row['pedido_id']]['kits'], array(
-                    'pedido_kito_id' => $row['pedido_kito_id'],
-                    'pedido_id' => $row['pedidoKit'],
-                    'cantidad' => $row['cantidad']
-                ));
-            }
-        }
-
-
-        $have_pro = false;
-        if ($row["usuario_id"] !== null) {
-
-            if (sizeof($final[$row['pedido_id']]['proveedores']) > 0) {
-                foreach ($final[$row['pedido_id']]['proveedores'] as $cat) {
-                    if ($cat['usuario_id'] == $row["usuario_id"]) {
-                        $have_pro = true;
-                    }
-                }
-            } else {
-                $final[$row['pedido_id']]['proveedores'][] = array(
-                    'usuario_id' => $row['usuario_id'],
-                    'nombre' => $row['nombreUsuario'],
-                    'apellido' => $row['apellido']
-                );
-
-                $have_pro = true;
-            }
-
-            if (!$have_pro) {
-                array_push($final[$row['pedido_id']]['proveedores'], array(
-                    'usuario_id' => $row['usuario_id'],
-                    'nombre' => $row['nombreUsuario'],
-                    'apellido' => $row['apellido']
-                ));
-            }
-        }
     }
     echo json_encode(array_values($final));
 }
@@ -586,10 +472,11 @@ GROUP BY p.pedido_id,
 /**
  * @descr Obtiene las pedidodetalles
  */
-function getPedidoDetalles()
+function getPedidosDetalles($pedido_id)
 {
     $db = new MysqliDb();
-    $results = $db->get('pedidodetalles');
+    $db->where('pedido_id', $pedido_id);
+    $results = $db->get('pedidos_detalles');
 
     echo json_encode($results);
 }
@@ -598,24 +485,44 @@ function getPedidoDetalles()
 /**
  * @descr Obtiene los pedidos. En caso de enviar un usuario_id != -1, se traerán todos los stocks. Solo usar esta opción cuando se aplica en la parte de administración
  */
-function getStocks($usuario_id)
+function getStocks()
 {
     $db = new MysqliDb();
-    if ($usuario_id != -1) {
-        $db->where('c.usuario_id', $usuario_id);
-    }
-    $db->join("usuarios u", "u.usuario_id=c.usuario_id", "LEFT");
-    $results = $db->get('stocks c', null, 'c.stock_id, c.status, c.total, c.fecha, c.usuario_id, u.nombre, u.apellido');
+    //    $results = $db->get('pedidos');
+    $results = $db->rawQuery('SELECT
+    p.stock_id,
+    p.producto_id,
+    p.proveedor_id,
+    p.sucursal_id,
+    p.fecha_compra,
+    p.cant_actual,
+    p.cant_inicial,
+    p.costo_uni,
+    pr.nombre,
+    pr.apellido,
+    o.nombre nombreProducto,
+    o.pto_repo
+FROM
+    pedidos p
+        INNER JOIN
+    usuarios pr ON p.proveedor_id = pr.usuario_id
+        INNER JOIN
+    productos o ON o.producto_id = p.producto_id
+GROUP BY p.stock_id,
+    p.producto_id,
+    p.proveedor_id,
+    p.sucursal_id,
+    p.fecha_compra,
+    p.cant_actual,
+    p.cant_inicial,
+    p.costo_uni,
+    pr.nombre,
+    pr.apellido,
+    o.nombre,
+    o.pto_repo
+;');
 
-    foreach ($results as $key => $row) {
 
-        $db = new MysqliDb();
-        $db->where('stock_id', $row['stock_id']);
-        $db->join("pedidos p", "p.pedido_id=c.pedido_id", "LEFT");
-        $pedidodetalles = $db->get('stock_detalles c', null, 'c.stock_detalle_id, c.stock_id, c.pedido_id, p.nombre, c.cantidad, c.en_oferta, c.precio_unitario');
-        $results[$key]['pedidodetalles'] = $pedidodetalles;
-
-    }
     echo json_encode($results);
 }
 
@@ -672,3 +579,80 @@ function checkStock($stock)
     return $stock;
 }
 
+/**
+ * @description Mueve una determinada cantidad de un producto a otra sucursal
+ * @param $origen_id
+ * @param $destino_id
+ * @param $producto_id
+ * @param $cantidad
+ */
+function trasladar($origen_id, $destino_id, $producto_id, $cantidad)
+{
+    $db = new MysqliDb();
+    $cant_a_mover = $cantidad;
+
+    $stock_origen = $db->rawQuery('select stock_id, cant_actual, costo_uni, proveedor_id from stock where sucursal_id = ' . $origen_id . '
+     and producto_id = ' . $producto_id . ' order by stock_id asc');
+    foreach ($stock_origen as $row) {
+
+        if ($cant_a_mover > 0 && $row["cant_actual"] > 0) {
+            if ($row["cant_actual"] < $cant_a_mover) {
+                $db->where('stock_id', $row['stock_id']);
+                $data = array('cant_actual' => 0);
+                $db->update('stock', $data);
+
+
+                $insertar = array('producto_id' => $producto_id,
+                    'proveedor_id' => $row['proveedor_id'],
+                    'sucursal_id' => $destino_id,
+                    'cant_actual' => $cant_a_mover - $row["cant_actual"],
+                    'cant_inicial' => $cant_a_mover - $row["cant_inicial"],
+                    'costo_uni' => $row['costo_uni']
+                );
+                $db->insert('stock', $insertar);
+
+                $cant_a_mover = $cant_a_mover - $row["cant_actual"];
+            }
+
+            if ($row["cant_actual"] > $cant_a_mover) {
+
+                $db->where('stock_id', $row['stock_id']);
+                $data = array('cant_actual' => $row["cant_actual"] - $cant_a_mover);
+                $db->update('stock', $data);
+
+                $insertar = array('producto_id' => $producto_id,
+                    'proveedor_id' => $row['proveedor_id'],
+                    'sucursal_id' => $destino_id,
+                    'cant_actual' => $cant_a_mover,
+                    'cant_inicial' => $cant_a_mover,
+                    'costo_uni' => $row['costo_uni']
+                );
+                $db->insert('stock', $insertar);
+
+                $cant_a_mover = 0;
+
+            }
+
+            if ($row["cant_actual"] == $cant_a_mover) {
+
+                $db->where('stock_id', $row['stock_id']);
+                $data = array('cant_actual' => 0);
+                $db->update('stock', $data);
+
+
+                $insertar = array('producto_id' => $producto_id,
+                    'proveedor_id' => $row['proveedor_id'],
+                    'sucursal_id' => $destino_id,
+                    'cant_actual' => $cant_a_mover,
+                    'cant_inicial' => $cant_a_mover,
+                    'costo_uni' => $row['costo_uni']
+                );
+                $db->insert('stock', $insertar);
+
+                $cant_a_mover = 0;
+            }
+        }
+    }
+
+    echo json_encode($db->getLastError());
+}
