@@ -501,13 +501,18 @@ function getStocks()
     pr.nombre,
     pr.apellido,
     o.nombre nombreProducto,
-    o.pto_repo
+    o.pto_repo,
+    pe.precio_id,
+    pe.precio_tipo_id,
+    pe.precio
 FROM
     stock p
         LEFT JOIN
     usuarios pr ON p.proveedor_id = pr.usuario_id
         INNER JOIN
     productos o ON o.producto_id = p.producto_id
+        INNER JOIN
+    precios pe ON o.producto_id = pe.producto_id
 GROUP BY p.stock_id,
     p.producto_id,
     p.proveedor_id,
@@ -519,11 +524,67 @@ GROUP BY p.stock_id,
     pr.nombre,
     pr.apellido,
     o.nombre,
-    o.pto_repo
+    o.pto_repo,
+    pe.precio_id,
+    pe.precio_tipo_id,
+    pe.precio
 ;');
 
 
-    echo json_encode($results);
+    $final = array();
+    foreach ($results as $row) {
+
+        if (!isset($final[$row["stock_id"]])) {
+            $final[$row["stock_id"]] = array(
+                'stock_id' => $row["stock_id"],
+                'producto_id' => $row["producto_id"],
+                'proveedor_id' => $row["proveedor_id"],
+                'sucursal_id' => $row["sucursal_id"],
+                'fecha_compra' => $row["fecha_compra"],
+                'cant_actual' => $row["cant_actual"],
+                'cant_inicial' => $row["cant_inicial"],
+                'costo_uni' => $row["costo_uni"],
+                'nombre' => $row["nombre"],
+                'apellido' => $row["apellido"],
+                'nombreProducto' => $row["nombreProducto"],
+                'pto_repo' => $row["pto_repo"],
+                'precios' => array()
+            );
+        }
+
+
+
+        $have_pre = false;
+        if ($row["precio_id"] !== null) {
+
+            if (sizeof($final[$row['stock_id']]['precios']) > 0) {
+                foreach ($final[$row['stock_id']]['precios'] as $cat) {
+                    if ($cat['precio_id'] == $row["precio_id"]) {
+                        $have_pre = true;
+                    }
+                }
+            } else {
+                $final[$row['stock_id']]['precios'][] = array(
+                    'precio_id' => $row['precio_id'],
+                    'precio_tipo_id' => $row['precio_tipo_id'],
+                    'precio' => $row['precio']
+                );
+
+                $have_pre = true;
+            }
+
+            if(!$have_pre){
+                array_push($final[$row['stock_id']]['precios'], array(
+                    'precio_id' => $row['precio_id'],
+                    'precio_tipo_id' => $row['precio_tipo_id'],
+                    'precio' => $row['precio']
+                ));
+            }
+        }
+
+
+    }
+    echo json_encode(array_values($final));
 }
 
 /**
