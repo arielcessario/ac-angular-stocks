@@ -4,7 +4,7 @@
     var scripts = document.getElementsByTagName("script");
     var currentScriptPath = scripts[scripts.length - 1].src;
 
-    angular.module('acProductos', [])
+    angular.module('acStocks', [])
         .factory('PedidoService', PedidoService)
         .service('PedidoVars', PedidoVars)
         .factory('StockService', StockService)
