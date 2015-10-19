@@ -492,7 +492,7 @@
         //Variables
         var service = {};
 
-        var url = currentScriptPath.replace('ac-productos.js', '/includes/ac-productos.php');
+        var url = currentScriptPath.replace('ac-stocks.js', '/includes/ac-stocks.php');
 
         //Function declarations
         service.get = get;
@@ -503,7 +503,7 @@
         service.update = update;
         service.aReponer = aReponer;
         service.trasladar = trasladar; // Por performance es mejor hacer en el php
-        service.getDiponibles = getDisponibles;
+        service.getDisponibles = getDisponibles;
 
         service.remove = remove;
 
@@ -516,34 +516,38 @@
 
         //Functions
         function getDisponibles(sucursal_id, nombreProducto, callback) {
+
             get(function (data) {
-                var response = data.filter(function (element, index, array) {
+                var response = [];
+                var productos = [];
+                if (data.length > 0) {
+                    response = data.filter(function (element, index, array) {
 
-                    var productos = [];
 
-                    if (element.sucursal_id == sucursal_id &&
-                        nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) &&
-                        element.cant_actual > 0) {
 
-                        var encontrado = false;
-                        for (var i = 0; i < productos.length; i++) {
-                            if (productos[i].producto_id == element.producto_id) {
-                                encontrado = true;
+                        if (element.sucursal_id == sucursal_id &&
+                            element.nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) > -1 &&
+                            element.cant_actual > 0) {
+
+                            var encontrado = false;
+                            for (var i = 0; i < productos.length; i++) {
+
+                                if (productos[i].producto_id == element.producto_id) {
+                                    encontrado = true;
+                                    productos[i].cant_actual = element.cant_actual + productos[i].cant_actual;
+                                }
                             }
+
+                            if (!encontrado) {
+                                var prod = angular.copy(element);
+                                productos.push(prod);
+                            }
+
                         }
+                    });
+                }
 
-                        if (encontrado) {
-                            productos[i].cant_actual = element.cant_actual + productos[i].cant_actual;
-                        } else {
-                            var prod = angular.copy(element);
-                            productos.push(prod);
-                        }
-
-                    }
-                    return productos;
-                });
-
-                callback(response);
+                callback(productos);
             })
         }
 
@@ -603,7 +607,7 @@
          * @returns {*}
          */
         function get(callback) {
-            var urlGet = url + '?function=getStock';
+            var urlGet = url + '?function=getStocks';
             var $httpDefaultCache = $cacheFactory.get('$http');
             var cachedData = [];
 

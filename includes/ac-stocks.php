@@ -503,8 +503,8 @@ function getStocks()
     o.nombre nombreProducto,
     o.pto_repo
 FROM
-    pedidos p
-        INNER JOIN
+    stock p
+        LEFT JOIN
     usuarios pr ON p.proveedor_id = pr.usuario_id
         INNER JOIN
     productos o ON o.producto_id = p.producto_id
