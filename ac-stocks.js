@@ -571,7 +571,6 @@
                     });
                 }
 
-                console.log(productos);
                 callback(productos);
             })
         }
