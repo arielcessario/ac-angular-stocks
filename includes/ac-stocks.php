@@ -464,6 +464,8 @@ GROUP BY p.pedido_id,
             }
         }
 
+
+
     }
     echo json_encode(array_values($final));
 }
@@ -503,9 +505,13 @@ function getStocks($reducido)
     o.nombre nombreProducto,
     o.pto_repo,
     o.sku,
+    o.producto_tipo,
     pe.precio_id,
     pe.precio_tipo_id,
-    pe.precio
+    pe.precio,
+    pi.producto_kit_id,
+    pi.producto_id productoKitId,
+    pi.cantidad
 FROM
     stock p
         LEFT JOIN
@@ -514,6 +520,8 @@ FROM
     productos o ON o.producto_id = p.producto_id
         INNER JOIN
     precios pe ON o.producto_id = pe.producto_id
+        LEFT JOIN
+    productos_kits pi ON o.producto_id = pi.parent_id
     ' . (($reducido) ? ' WHERE p.cant_actual > 0 ' : '') . '
 GROUP BY p.stock_id,
     p.producto_id,
@@ -528,9 +536,13 @@ GROUP BY p.stock_id,
     o.nombre,
     o.pto_repo,
     o.sku,
+    o.producto_tipo,
     pe.precio_id,
     pe.precio_tipo_id,
-    pe.precio
+    pe.precio,
+    pi.producto_kit_id,
+    pi.producto_id,
+    pi.cantidad
 ;');
 
 
@@ -552,7 +564,9 @@ GROUP BY p.stock_id,
                 'nombreProducto' => $row["nombreProducto"],
                 'pto_repo' => $row["pto_repo"],
                 'sku' => $row["sku"],
-                'precios' => array()
+                'producto_tipo' => $row["producto_tipo"],
+                'precios' => array(),
+                'kits' => array()
             );
         }
 
@@ -581,6 +595,37 @@ GROUP BY p.stock_id,
                     'precio_id' => $row['precio_id'],
                     'precio_tipo_id' => $row['precio_tipo_id'],
                     'precio' => $row['precio']
+                ));
+            }
+        }
+
+
+
+
+        $have_kit = false;
+        if ($row["producto_kit_id"] !== null) {
+
+            if (sizeof($final[$row['stock_id']]['kits']) > 0) {
+                foreach ($final[$row['stock_id']]['kits'] as $cat) {
+                    if ($cat['producto_kit_id'] == $row["producto_kit_id"]) {
+                        $have_kit = true;
+                    }
+                }
+            } else {
+                $final[$row['stock_id']]['kits'][] = array(
+                    'producto_kit_id' => $row['producto_kit_id'],
+                    'producto_id' => $row['productoKitId'],
+                    'cantidad' => $row['cantidad']
+                );
+
+                $have_kit = true;
+            }
+
+            if(!$have_kit){
+                array_push($final[$row['stock_id']]['kits'], array(
+                    'producto_kit_id' => $row['producto_kit_id'],
+                    'producto_id' => $row['productoKitId'],
+                    'cantidad' => $row['cantidad']
                 ));
             }
         }
