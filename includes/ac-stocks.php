@@ -68,7 +68,7 @@ if ($decoded != null) {
     } elseif ($function == 'getPedidoDetalles') {
         getPedidosDetalles($_GET["pedido_id"]);
     } elseif ($function == 'getStocks') {
-        getStocks();
+        getStocks($_GET["reducido"]);
     }
 }
 
@@ -485,7 +485,7 @@ function getPedidosDetalles($pedido_id)
 /**
  * @descr Obtiene los pedidos. En caso de enviar un usuario_id != -1, se traerán todos los stocks. Solo usar esta opción cuando se aplica en la parte de administración
  */
-function getStocks()
+function getStocks($reducido)
 {
     $db = new MysqliDb();
     //    $results = $db->get('pedidos');
@@ -513,6 +513,7 @@ FROM
     productos o ON o.producto_id = p.producto_id
         INNER JOIN
     precios pe ON o.producto_id = pe.producto_id
+    ' . ($reducido) ? ' WHERE p.cant_actual > 0 ' : '' . '
 GROUP BY p.stock_id,
     p.producto_id,
     p.proveedor_id,
@@ -553,7 +554,6 @@ GROUP BY p.stock_id,
         }
 
 
-
         $have_pre = false;
         if ($row["precio_id"] !== null) {
 
@@ -573,7 +573,7 @@ GROUP BY p.stock_id,
                 $have_pre = true;
             }
 
-            if(!$have_pre){
+            if (!$have_pre) {
                 array_push($final[$row['stock_id']]['precios'], array(
                     'precio_id' => $row['precio_id'],
                     'precio_tipo_id' => $row['precio_tipo_id'],
