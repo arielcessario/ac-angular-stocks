@@ -513,7 +513,7 @@ FROM
     productos o ON o.producto_id = p.producto_id
         INNER JOIN
     precios pe ON o.producto_id = pe.producto_id
-    ' . ($reducido) ? ' WHERE p.cant_actual > 0 ' : '' . '
+    ' . (($reducido) ? ' WHERE p.cant_actual > 0 ' : '') . '
 GROUP BY p.stock_id,
     p.producto_id,
     p.proveedor_id,
