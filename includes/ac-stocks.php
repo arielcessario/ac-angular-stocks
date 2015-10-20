@@ -511,7 +511,7 @@ function getStocks($reducido)
     pe.precio,
     pi.producto_kit_id,
     pi.producto_id productoKitId,
-    pi.cantidad
+    pi.producto_cantidad
 FROM
     stock p
         LEFT JOIN
@@ -542,7 +542,7 @@ GROUP BY p.stock_id,
     pe.precio,
     pi.producto_kit_id,
     pi.producto_id,
-    pi.cantidad
+    pi.producto_cantidad
 ;');
 
 
@@ -615,7 +615,7 @@ GROUP BY p.stock_id,
                 $final[$row['stock_id']]['kits'][] = array(
                     'producto_kit_id' => $row['producto_kit_id'],
                     'producto_id' => $row['productoKitId'],
-                    'cantidad' => $row['cantidad']
+                    'producto_cantidad' => $row['producto_cantidad']
                 );
 
                 $have_kit = true;
@@ -625,7 +625,7 @@ GROUP BY p.stock_id,
                 array_push($final[$row['stock_id']]['kits'], array(
                     'producto_kit_id' => $row['producto_kit_id'],
                     'producto_id' => $row['productoKitId'],
-                    'cantidad' => $row['cantidad']
+                    'producto_cantidad' => $row['producto_cantidad']
                 ));
             }
         }
