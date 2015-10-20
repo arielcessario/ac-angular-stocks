@@ -523,7 +523,6 @@
                 if (data.length > 0) {
                     response = data.filter(function (element, index, array) {
 
-
                         if (element.sucursal_id == sucursal_id &&
                             element.nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) > -1 &&
                             element.cant_actual > 0) {
