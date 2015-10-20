@@ -502,6 +502,7 @@ function getStocks($reducido)
     pr.apellido,
     o.nombre nombreProducto,
     o.pto_repo,
+    o.sku,
     pe.precio_id,
     pe.precio_tipo_id,
     pe.precio
@@ -526,6 +527,7 @@ GROUP BY p.stock_id,
     pr.apellido,
     o.nombre,
     o.pto_repo,
+    o.sku,
     pe.precio_id,
     pe.precio_tipo_id,
     pe.precio
@@ -549,6 +551,7 @@ GROUP BY p.stock_id,
                 'apellido' => $row["apellido"],
                 'nombreProducto' => $row["nombreProducto"],
                 'pto_repo' => $row["pto_repo"],
+                'sku' => $row["sku"],
                 'precios' => array()
             );
         }
