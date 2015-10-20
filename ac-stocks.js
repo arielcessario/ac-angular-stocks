@@ -272,7 +272,7 @@
 
         /**
          * @description Retorna la lista filtrada de pedidos
-         * @param param -> String, separado por comas (,) que contiene la lista de par�metros de b�squeda, por ej: nombre, sku
+         * @param param -> String, separado por comas (,) que contiene la lista de parï¿½metros de bï¿½squeda, por ej: nombre, sku
          * @param value
          * @param callback
          */
@@ -369,33 +369,33 @@
         }
 
         /**
-         * Para el uso de la p�ginaci�n, definir en el controlador las siguientes variables:
+         * Para el uso de la pï¿½ginaciï¿½n, definir en el controlador las siguientes variables:
          *
          vm.start = 0;
          vm.pagina = PedidoVars.pagina;
-         PedidoVars.paginacion = 5; Cantidad de registros por p�gina
+         PedidoVars.paginacion = 5; Cantidad de registros por pï¿½gina
          vm.end = PedidoVars.paginacion;
 
 
          En el HTML, en el ng-repeat agregar el siguiente filtro: limitTo:appCtrl.end:appCtrl.start;
 
-         Agregar un bot�n de next:
+         Agregar un botï¿½n de next:
          <button ng-click="appCtrl.next()">next</button>
 
-         Agregar un bot�n de prev:
+         Agregar un botï¿½n de prev:
          <button ng-click="appCtrl.prev()">prev</button>
 
-         Agregar un input para la p�gina:
+         Agregar un input para la pï¿½gina:
          <input type="text" ng-keyup="appCtrl.goToPagina()" ng-model="appCtrl.pagina">
 
          */
 
 
         /**
-         * @description: Ir a p�gina
+         * @description: Ir a pï¿½gina
          * @param pagina
          * @returns {*}
-         * uso: agregar un m�todo
+         * uso: agregar un mï¿½todo
          vm.goToPagina = function () {
                 vm.start= PedidoService.goToPagina(vm.pagina).start;
             };
@@ -420,7 +420,7 @@
 
         /**
          * @name next
-         * @description Ir a pr�xima p�gina
+         * @description Ir a prï¿½xima pï¿½gina
          * @returns {*}
          * uso agregar un metodo
          vm.next = function () {
@@ -441,9 +441,9 @@
 
         /**
          * @name previous
-         * @description Ir a p�gina anterior
+         * @description Ir a pï¿½gina anterior
          * @returns {*}
-         * uso, agregar un m�todo
+         * uso, agregar un mï¿½todo
          vm.prev = function () {
                 vm.start= PedidoService.prev().start;
                 vm.pagina = PedidoVars.pagina;
@@ -471,17 +471,17 @@
      * @constructor
      */
     function PedidoVars() {
-        // Cantidad de p�ginas total del recordset
+        // Cantidad de pï¿½ginas total del recordset
         this.paginas = 1;
-        // P�gina seleccionada
+        // Pï¿½gina seleccionada
         this.pagina = 1;
-        // Cantidad de registros por p�gina
+        // Cantidad de registros por pï¿½gina
         this.paginacion = 10;
-        // Registro inicial, no es p�gina, es el registro
+        // Registro inicial, no es pï¿½gina, es el registro
         this.start = 0;
 
 
-        // Indica si se debe limpiar el cach� la pr�xima vez que se solicite un get
+        // Indica si se debe limpiar el cachï¿½ la prï¿½xima vez que se solicite un get
         this.clearCache = true;
 
     }
@@ -532,12 +532,37 @@
 
                                 if (productos[i].producto_id == element.producto_id) {
                                     encontrado = true;
+
+
+                                    // Esto es solo para que funcione con los movimientos, hay que sacarlo cuando volvamos a hacer movimientos
+
+                                    var st={
+                                        cant_actual: element.cant_actual,
+                                        costo_uni: element.costo_uni,
+                                        stock_id: element.stock_id,
+                                        sucursal_id: element.sucursal_id
+
+                                    };
+                                    productos[i].stock.push(st);
                                     productos[i].cant_actual = element.cant_actual + productos[i].cant_actual;
+
                                 }
                             }
 
                             if (!encontrado) {
                                 var prod = angular.copy(element);
+
+                                // Esto es solo para que funcione con los movimientos, hay que sacarlo cuando volvamos a hacer movimientos
+                                prod.stock = [];
+                                var st={
+                                    cant_actual: prod.cant_actual,
+                                    costo_uni: prod.costo_uni,
+                                    stock_id: prod.stock_id,
+                                    sucursal_id: prod.sucursal_id
+
+                                };
+                                prod.stock.push(st);
+                                //
                                 productos.push(prod);
                             }
 
@@ -545,6 +570,7 @@
                     });
                 }
 
+                console.log(productos);
                 callback(productos);
             })
         }
@@ -639,7 +665,7 @@
 
         /**
          * @description Retorna la lista filtrada de stocks
-         * @param param -> String, separado por comas (,) que contiene la lista de par�metros de b�squeda, por ej: nombre, sku
+         * @param param -> String, separado por comas (,) que contiene la lista de parï¿½metros de bï¿½squeda, por ej: nombre, sku
          * @param value
          * @param callback
          */
@@ -715,33 +741,33 @@
         }
 
         /**
-         * Para el uso de la p�ginaci�n, definir en el controlador las siguientes variables:
+         * Para el uso de la pï¿½ginaciï¿½n, definir en el controlador las siguientes variables:
          *
          vm.start = 0;
          vm.pagina = StockVars.pagina;
-         StockVars.paginacion = 5; Cantidad de registros por p�gina
+         StockVars.paginacion = 5; Cantidad de registros por pï¿½gina
          vm.end = StockVars.paginacion;
 
 
          En el HTML, en el ng-repeat agregar el siguiente filtro: limitTo:appCtrl.end:appCtrl.start;
 
-         Agregar un bot�n de next:
+         Agregar un botï¿½n de next:
          <button ng-click="appCtrl.next()">next</button>
 
-         Agregar un bot�n de prev:
+         Agregar un botï¿½n de prev:
          <button ng-click="appCtrl.prev()">prev</button>
 
-         Agregar un input para la p�gina:
+         Agregar un input para la pï¿½gina:
          <input type="text" ng-keyup="appCtrl.goToPagina()" ng-model="appCtrl.pagina">
 
          */
 
 
         /**
-         * @description: Ir a p�gina
+         * @description: Ir a pï¿½gina
          * @param pagina
          * @returns {*}
-         * uso: agregar un m�todo
+         * uso: agregar un mï¿½todo
          vm.goToPagina = function () {
                 vm.start= StockService.goToPagina(vm.pagina).start;
             };
@@ -766,7 +792,7 @@
 
         /**
          * @name next
-         * @description Ir a pr�xima p�gina
+         * @description Ir a prï¿½xima pï¿½gina
          * @returns {*}
          * uso agregar un metodo
          vm.next = function () {
@@ -787,9 +813,9 @@
 
         /**
          * @name previous
-         * @description Ir a p�gina anterior
+         * @description Ir a pï¿½gina anterior
          * @returns {*}
-         * uso, agregar un m�todo
+         * uso, agregar un mï¿½todo
          vm.prev = function () {
                 vm.start= StockService.prev().start;
                 vm.pagina = StockVars.pagina;
@@ -817,19 +843,19 @@
      * @constructor
      */
     function StockVars() {
-        // Cantidad de p�ginas total del recordset
+        // Cantidad de pï¿½ginas total del recordset
         this.paginas = 1;
-        // P�gina seleccionada
+        // Pï¿½gina seleccionada
         this.pagina = 1;
-        // Cantidad de registros por p�gina
+        // Cantidad de registros por pï¿½gina
         this.paginacion = 10;
-        // Registro inicial, no es p�gina, es el registro
+        // Registro inicial, no es pï¿½gina, es el registro
         this.start = 0;
 
         // Variable que regristra si se traen todos los stocks o solos los mayores a 0
         this.reducido = true;
 
-        // Indica si se debe limpiar el cach� la pr�xima vez que se solicite un get
+        // Indica si se debe limpiar el cachï¿½ la prï¿½xima vez que se solicite un get
         this.clearCache = true;
 
     }
