@@ -524,7 +524,8 @@
                     response = data.filter(function (element, index, array) {
 
                         if (element.sucursal_id == sucursal_id &&
-                            element.nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) > -1 &&
+                            (element.nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) > -1 ||
+                            (element.sku != null && element.sku.indexOf(nombreProducto) > -1))&&
                             element.cant_actual > 0) {
 
                             var encontrado = false;
