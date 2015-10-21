@@ -93,7 +93,7 @@ function createPedido($pedido)
 
     $result = $db->insert('pedidos', $data);
     if ($result > -1) {
-        foreach ($item_decoded->depidos_detalles as $pedido_detalle) {
+        foreach ($item_decoded->pedidos_detalles as $pedido_detalle) {
             $subitem_decoded = checkPedidodetalle(json_decode($pedido_detalle));
 
             $data = array(
