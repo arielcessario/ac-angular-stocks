@@ -104,8 +104,8 @@ function createPedido($pedido)
                 'precio_total' => $subitem_decoded->precio_total
             );
 
-            $result = $db->insert('pedidos_detalles', $data);
-            if ($result > -1) {
+            $ped = $db->insert('pedidos_detalles', $data);
+            if ($ped > -1) {
             } else {
                 $db->rollback();
                 echo json_encode(-1);
@@ -205,6 +205,7 @@ function updatePedido($pedido)
 
 
     if ($result) {
+        $db->where('pedido_id', $item_decoded->pedido_id);
         $db->delete('pedidos_detalles');
         foreach ($item_decoded->pedidos_detalles as $pedido_detalle) {
             $subitem_decoded = checkPedidodetalle($pedido_detalle);
