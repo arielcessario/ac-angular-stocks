@@ -391,10 +391,10 @@ FROM
         INNER JOIN
     usuarios pr ON p.proveedor_id = pr.usuario_id
         LEFT JOIN
-    pedidos_detalles pd ON p.pedido_id = pr.pedido_id
+    pedidos_detalles pd ON p.pedido_id = p.pedido_id
         INNER JOIN
     productos o ON o.producto_id = pd.producto_id ' .
-        ((!$all) ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"' : '')
+        (($all == 'false') ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"' : '')
         . '
 
             GROUP BY p.pedido_id,
