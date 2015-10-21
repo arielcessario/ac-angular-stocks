@@ -45,7 +45,26 @@ if ($decoded != null) {
     } else if ($decoded->function == 'createPedidoDetalle') {
         createPedidoDetalle($decoded->pedido´_detalle);
     } else if ($decoded->function == 'createStock') {
-        createStock($decoded->stock);
+
+        // Siempre que se envía un stock, debería ser una lista de productos para guardar, por lo cual es mejor hacerlo desde el lado del servidor.
+
+        $stock_list = json_decode($decoded->stock);
+        $db = new MysqliDb();
+        $db->startTransaction();
+        foreach ($stock_list as $stock) {
+            $result = createStock($stock, $db);
+
+            if ($result > -1) {
+
+            } else {
+                $db->rollback();
+                echo json_encode(-1);
+                return;
+            }
+        }
+        $db->commit();
+        echo json_encode(1);
+
     } else if ($decoded->function == 'updatePedido') {
         updatePedido($decoded->pedido);
     } else if ($decoded->function == 'updatePedidoDetalle') {
@@ -124,12 +143,12 @@ function createPedido($pedido)
 
 /**Crea una entrada de stock por producto.
  * @param $stock
+ * @param $db
  */
-function createStock($stock)
+function createStock($stock, $db)
 {
-    $db = new MysqliDb();
-    $db->startTransaction();
-    $item_decoded = checkPedidodetalle(json_decode($stock));
+
+    $item_decoded = checkPedidodetalle($stock);
 
     $data = array(
         'producto_id' => $item_decoded->producto_id,
@@ -141,13 +160,8 @@ function createStock($stock)
     );
 
     $result = $db->insert('pedidodetalles', $data);
-    if ($result > -1) {
-        $db->commit();
-        echo json_encode($result);
-    } else {
-        $db->rollback();
-        echo json_encode(-1);
-    }
+
+    return $result;
 }
 
 
