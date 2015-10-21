@@ -97,7 +97,7 @@ function createPedido($pedido)
             $subitem_decoded = checkPedidodetalle($pedido_detalle);
 
             $data = array(
-                'pedido_id' => $item_decoded->pedido_id,
+                'pedido_id' => $result,
                 'producto_id' => $subitem_decoded->producto_id,
                 'cantidad' => $subitem_decoded->cantidad,
                 'precio_unidad' => $subitem_decoded->precio_unidad,
@@ -106,9 +106,10 @@ function createPedido($pedido)
 
             $result = $db->insert('pedidos_detalles', $data);
             if ($result > -1) {
-                $db->commit();
             } else {
                 $db->rollback();
+                echo json_encode(-1);
+                return;
             }
         }
 
