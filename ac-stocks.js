@@ -238,7 +238,7 @@
          * @returns {*}
          */
         function get(callback) {
-            var urlGet = url + '?function=getPedidos';
+            var urlGet = url + '?function=getPedidos&all=' + PedidoVars.all;
             var $httpDefaultCache = $cacheFactory.get('$http');
             var cachedData = [];
 
@@ -481,6 +481,8 @@
         this.start = 0;
 
 
+        // Indica si debe traer todos los pedidos o solo los activos, por defecto, solo los activos
+        this.all = false;
         // Indica si se debe limpiar el cachï¿½ la prï¿½xima vez que se solicite un get
         this.clearCache = true;
 
@@ -525,7 +527,7 @@
 
                         if (element.sucursal_id == sucursal_id &&
                             (element.nombreProducto.toUpperCase().indexOf(nombreProducto.toUpperCase()) > -1 ||
-                            (element.sku != null && element.sku.indexOf(nombreProducto) > -1))&&
+                            (element.sku != null && element.sku.indexOf(nombreProducto) > -1)) &&
                             element.cant_actual > 0) {
 
                             var encontrado = false;
@@ -537,7 +539,7 @@
 
                                     // Esto es solo para que funcione con los movimientos, hay que sacarlo cuando volvamos a hacer movimientos
 
-                                    var st={
+                                    var st = {
                                         cant_actual: element.cant_actual,
                                         costo_uni: element.costo_uni,
                                         stock_id: element.stock_id,
@@ -555,7 +557,7 @@
 
                                 // Esto es solo para que funcione con los movimientos, hay que sacarlo cuando volvamos a hacer movimientos
                                 prod.stock = [];
-                                var st={
+                                var st = {
                                     cant_actual: prod.cant_actual,
                                     costo_uni: prod.costo_uni,
                                     stock_id: prod.stock_id,

@@ -64,7 +64,7 @@ if ($decoded != null) {
 } else {
     $function = $_GET["function"];
     if ($function == 'getPedidos') {
-        getPedidos();
+        getPedidos($_GET["all"]);
     } elseif ($function == 'getPedidoDetalles') {
         getPedidosDetalles($_GET["pedido_id"]);
     } elseif ($function == 'getStocks') {
@@ -358,8 +358,9 @@ function removeStock($stock_id)
 /////// GET ////////
 /**
  * @descr Obtiene los pedidos
+ * @param $all si debe traer solo los activo o todos, por defecto, solo los activos
  */
-function getPedidos()
+function getPedidos($all)
 {
     $db = new MysqliDb();
 
@@ -392,26 +393,28 @@ FROM
         LEFT JOIN
     pedidos_detalles pd ON p.pedido_id = pr.pedido_id
         INNER JOIN
-    productos o ON o.producto_id = pd.producto_id
-GROUP BY p.pedido_id,
-    p.proveedor_id,
-    p.usuario_id,
-    p.fecha_pedido,
-    p.fecha_entrega,
-    p.total,
-    p.iva,
-    p.sucursal_id,
-    pr.nombre,
-    pr.apellido,
-    u.nombre,
-    u.apellido,
-    pd.pedido_detalle_id,
-    pd.producto_id,
-    pd.cantidad,
-    pd.precio_unidad,
-    pd.precio_total,
-    o.nombre
-;');
+    productos o ON o.producto_id = pd.producto_id ' .
+        ((!$all) ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"':'')
+        . '
+
+            GROUP BY p . pedido_id,
+    p . proveedor_id,
+    p . usuario_id,
+    p . fecha_pedido,
+    p . fecha_entrega,
+    p . total,
+    p . iva,
+    p . sucursal_id,
+    pr . nombre,
+    pr . apellido,
+    u . nombre,
+    u . apellido,
+    pd . pedido_detalle_id,
+    pd . producto_id,
+    pd . cantidad,
+    pd . precio_unidad,
+    pd . precio_total,
+    o . nombre;');
 
 
     $final = array();
@@ -492,58 +495,57 @@ function getStocks($reducido)
     $db = new MysqliDb();
     //    $results = $db->get('pedidos');
     $results = $db->rawQuery('SELECT
-    p.stock_id,
-    p.producto_id,
-    p.proveedor_id,
-    p.sucursal_id,
-    p.fecha_compra,
-    p.cant_actual,
-    p.cant_inicial,
-    p.costo_uni,
-    pr.nombre,
-    pr.apellido,
-    o.nombre nombreProducto,
-    o.pto_repo,
-    o.sku,
-    o.producto_tipo,
-    pe.precio_id,
-    pe.precio_tipo_id,
-    pe.precio,
-    pi.producto_kit_id,
-    pi.producto_id productoKitId,
-    pi.producto_cantidad
+    p . stock_id,
+    p . producto_id,
+    p . proveedor_id,
+    p . sucursal_id,
+    p . fecha_compra,
+    p . cant_actual,
+    p . cant_inicial,
+    p . costo_uni,
+    pr . nombre,
+    pr . apellido,
+    o . nombre nombreProducto,
+    o . pto_repo,
+    o . sku,
+    o . producto_tipo,
+    pe . precio_id,
+    pe . precio_tipo_id,
+    pe . precio,
+    pi . producto_kit_id,
+    pi . producto_id productoKitId,
+    pi . producto_cantidad
 FROM
     stock p
         LEFT JOIN
-    usuarios pr ON p.proveedor_id = pr.usuario_id
+    usuarios pr ON p . proveedor_id = pr . usuario_id
         INNER JOIN
-    productos o ON o.producto_id = p.producto_id
+    productos o ON o . producto_id = p . producto_id
         INNER JOIN
-    precios pe ON o.producto_id = pe.producto_id
+    precios pe ON o . producto_id = pe . producto_id
         LEFT JOIN
-    productos_kits pi ON o.producto_id = pi.parent_id
-    ' . (($reducido) ? ' WHERE p.cant_actual > 0 ' : '') . '
-GROUP BY p.stock_id,
-    p.producto_id,
-    p.proveedor_id,
-    p.sucursal_id,
-    p.fecha_compra,
-    p.cant_actual,
-    p.cant_inicial,
-    p.costo_uni,
-    pr.nombre,
-    pr.apellido,
-    o.nombre,
-    o.pto_repo,
-    o.sku,
-    o.producto_tipo,
-    pe.precio_id,
-    pe.precio_tipo_id,
-    pe.precio,
-    pi.producto_kit_id,
-    pi.producto_id,
-    pi.producto_cantidad
-;');
+    productos_kits pi ON o . producto_id = pi . parent_id
+    ' . (($reducido) ? ' WHERE p . cant_actual > 0 ' : '') . '
+GROUP BY p . stock_id,
+    p . producto_id,
+    p . proveedor_id,
+    p . sucursal_id,
+    p . fecha_compra,
+    p . cant_actual,
+    p . cant_inicial,
+    p . costo_uni,
+    pr . nombre,
+    pr . apellido,
+    o . nombre,
+    o . pto_repo,
+    o . sku,
+    o . producto_tipo,
+    pe . precio_id,
+    pe . precio_tipo_id,
+    pe . precio,
+    pi . producto_kit_id,
+    pi . producto_id,
+    pi . producto_cantidad;');
 
 
     $final = array();
@@ -647,7 +649,7 @@ function checkPedido($pedido)
     $pedido->proveedor_id = (!array_key_exists("proveedor_id", $pedido)) ? -1 : $pedido->proveedor_id;
     $pedido->usuario_id = (!array_key_exists("usuario_id", $pedido)) ? -1 : $pedido->usuario_id;
     $pedido->fecha_pedido = (!array_key_exists("fecha_pedido", $pedido)) ? '' : $pedido->fecha_pedido;
-    $pedido->fecha_entrega = (!array_key_exists("fecha_entrega", $pedido)) ? '0000-00-00 00:00:00' : $pedido->fecha_entrega;
+    $pedido->fecha_entrega = (!array_key_exists("fecha_entrega", $pedido)) ? '0000 - 00 - 00 00:00:00' : $pedido->fecha_entrega;
     $pedido->total = (!array_key_exists("total", $pedido)) ? 1 : $pedido->total;
     $pedido->iva = (!array_key_exists("iva", $pedido)) ? 0.0 : $pedido->iva;
     $pedido->sucursal_id = (!array_key_exists("sucursal_id", $pedido)) ? -1 : $pedido->sucursal_id;
@@ -701,7 +703,7 @@ function trasladar($origen_id, $destino_id, $producto_id, $cantidad)
     $cant_a_mover = $cantidad;
 
     $stock_origen = $db->rawQuery('select stock_id, cant_actual, costo_uni, proveedor_id from stock where sucursal_id = ' . $origen_id . '
-     and producto_id = ' . $producto_id . ' order by stock_id asc');
+and producto_id = ' . $producto_id . ' order by stock_id asc');
     foreach ($stock_origen as $row) {
 
         if ($cant_a_mover > 0 && $row["cant_actual"] > 0) {
