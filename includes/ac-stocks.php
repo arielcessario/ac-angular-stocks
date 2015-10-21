@@ -394,27 +394,27 @@ FROM
     pedidos_detalles pd ON p.pedido_id = pr.pedido_id
         INNER JOIN
     productos o ON o.producto_id = pd.producto_id ' .
-        ((!$all) ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"':'')
+        ((!$all) ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"' : '')
         . '
 
-            GROUP BY p . pedido_id,
-    p . proveedor_id,
-    p . usuario_id,
-    p . fecha_pedido,
-    p . fecha_entrega,
-    p . total,
-    p . iva,
-    p . sucursal_id,
-    pr . nombre,
-    pr . apellido,
-    u . nombre,
-    u . apellido,
-    pd . pedido_detalle_id,
-    pd . producto_id,
-    pd . cantidad,
-    pd . precio_unidad,
-    pd . precio_total,
-    o . nombre;');
+            GROUP BY p.pedido_id,
+    p.proveedor_id,
+    p.usuario_id,
+    p.fecha_pedido,
+    p.fecha_entrega,
+    p.total,
+    p.iva,
+    p.sucursal_id,
+    pr.nombre,
+    pr.apellido,
+    u.nombre,
+    u.apellido,
+    pd.pedido_detalle_id,
+    pd.producto_id,
+    pd.cantidad,
+    pd.precio_unidad,
+    pd.precio_total,
+    o.nombre;');
 
 
     $final = array();
@@ -468,7 +468,6 @@ FROM
         }
 
 
-
     }
     echo json_encode(array_values($final));
 }
@@ -495,57 +494,57 @@ function getStocks($reducido)
     $db = new MysqliDb();
     //    $results = $db->get('pedidos');
     $results = $db->rawQuery('SELECT
-    p . stock_id,
-    p . producto_id,
-    p . proveedor_id,
-    p . sucursal_id,
-    p . fecha_compra,
-    p . cant_actual,
-    p . cant_inicial,
-    p . costo_uni,
-    pr . nombre,
-    pr . apellido,
-    o . nombre nombreProducto,
-    o . pto_repo,
-    o . sku,
-    o . producto_tipo,
-    pe . precio_id,
-    pe . precio_tipo_id,
-    pe . precio,
-    pi . producto_kit_id,
-    pi . producto_id productoKitId,
-    pi . producto_cantidad
+    p.stock_id,
+    p.producto_id,
+    p.proveedor_id,
+    p.sucursal_id,
+    p.fecha_compra,
+    p.cant_actual,
+    p.cant_inicial,
+    p.costo_uni,
+    pr.nombre,
+    pr.apellido,
+    o.nombre nombreProducto,
+    o.pto_repo,
+    o.sku,
+    o.producto_tipo,
+    pe.precio_id,
+    pe.precio_tipo_id,
+    pe.precio,
+    pi.producto_kit_id,
+    pi.producto_id productoKitId,
+    pi.producto_cantidad
 FROM
     stock p
         LEFT JOIN
-    usuarios pr ON p . proveedor_id = pr . usuario_id
+    usuarios pr ON p.proveedor_id = pr.usuario_id
         INNER JOIN
-    productos o ON o . producto_id = p . producto_id
+    productos o ON o.producto_id = p.producto_id
         INNER JOIN
-    precios pe ON o . producto_id = pe . producto_id
+    precios pe ON o.producto_id = pe.producto_id
         LEFT JOIN
-    productos_kits pi ON o . producto_id = pi . parent_id
-    ' . (($reducido) ? ' WHERE p . cant_actual > 0 ' : '') . '
-GROUP BY p . stock_id,
-    p . producto_id,
-    p . proveedor_id,
-    p . sucursal_id,
-    p . fecha_compra,
-    p . cant_actual,
-    p . cant_inicial,
-    p . costo_uni,
-    pr . nombre,
-    pr . apellido,
-    o . nombre,
-    o . pto_repo,
-    o . sku,
-    o . producto_tipo,
-    pe . precio_id,
-    pe . precio_tipo_id,
-    pe . precio,
-    pi . producto_kit_id,
-    pi . producto_id,
-    pi . producto_cantidad;');
+    productos_kits pi ON o.producto_id = pi.parent_id
+    ' . (($reducido) ? ' WHERE p.cant_actual > 0 ' : '') . '
+GROUP BY p.stock_id,
+    p.producto_id,
+    p.proveedor_id,
+    p.sucursal_id,
+    p.fecha_compra,
+    p.cant_actual,
+    p.cant_inicial,
+    p.costo_uni,
+    pr.nombre,
+    pr.apellido,
+    o.nombre,
+    o.pto_repo,
+    o.sku,
+    o.producto_tipo,
+    pe.precio_id,
+    pe.precio_tipo_id,
+    pe.precio,
+    pi.producto_kit_id,
+    pi.producto_id,
+    pi.producto_cantidad;');
 
 
     $final = array();
@@ -602,8 +601,6 @@ GROUP BY p . stock_id,
         }
 
 
-
-
         $have_kit = false;
         if ($row["producto_kit_id"] !== null) {
 
@@ -623,7 +620,7 @@ GROUP BY p . stock_id,
                 $have_kit = true;
             }
 
-            if(!$have_kit){
+            if (!$have_kit) {
                 array_push($final[$row['stock_id']]['kits'], array(
                     'producto_kit_id' => $row['producto_kit_id'],
                     'producto_id' => $row['productoKitId'],
