@@ -94,7 +94,7 @@ function createPedido($pedido)
     $result = $db->insert('pedidos', $data);
     if ($result > -1) {
         foreach ($item_decoded->pedidos_detalles as $pedido_detalle) {
-            $subitem_decoded = checkPedidodetalle(json_decode($pedido_detalle));
+            $subitem_decoded = checkPedidodetalle($pedido_detalle);
 
             $data = array(
                 'pedido_id' => $item_decoded->pedido_id,
