@@ -205,8 +205,8 @@ function updatePedido($pedido)
 
     if ($result) {
         $db->delete('pedidos_detalles');
-        foreach ($item_decoded->depidos_detalles as $pedido_detalle) {
-            $subitem_decoded = checkPedidodetalle(json_decode($pedido_detalle));
+        foreach ($item_decoded->pedidos_detalles as $pedido_detalle) {
+            $subitem_decoded = checkPedidodetalle($pedido_detalle);
 
             $data = array(
                 'pedido_id' => $item_decoded->pedido_id,
