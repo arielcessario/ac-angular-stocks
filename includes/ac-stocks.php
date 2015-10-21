@@ -218,13 +218,15 @@ function updatePedido($pedido)
 
             $result = $db->insert('pedidos_detalles', $data);
             if ($result > -1) {
-                $db->commit();
             } else {
                 $db->rollback();
+                echo json_encode(-1);
+                return;
             }
-            $db->commit();
-            echo json_encode($result);
+
         }
+        $db->commit();
+        echo json_encode($result);
     } else {
         $db->rollback();
         echo json_encode(-1);
@@ -451,7 +453,8 @@ FROM
                 }
             } else {
                 $final[$row['pedido_id']]['pedidos_detalles'][] = array(
-                    'pedidodetalle_id' => $row['pedido_detalle_id'],
+                    'pedido_detalle_id' => $row['pedido_detalle_id'],
+                    'producto_id' => $row['producto_id'],
                     'cantidad' => $row['cantidad'],
                     'precio_unidad' => $row['precio_unidad'],
                     'precio_total' => $row['precio_total'],
@@ -462,8 +465,9 @@ FROM
             }
 
             if (!$have_pde) {
-                array_push($final[$row['pedido_id']]['pedidodetalles'], array(
+                array_push($final[$row['pedido_id']]['pedidos_detalles'], array(
                     'pedido_detalle_id' => $row['pedido_detalle_id'],
+                    'producto_id' => $row['producto_id'],
                     'cantidad' => $row['cantidad'],
                     'precio_unidad' => $row['precio_unidad'],
                     'precio_total' => $row['precio_total'],
