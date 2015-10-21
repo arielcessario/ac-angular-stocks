@@ -365,7 +365,8 @@ function getPedidos($all)
     $db = new MysqliDb();
 
 //    $results = $db->get('pedidos');
-    $results = $db->rawQuery('SELECT
+
+    $SQL = 'SELECT
     p.pedido_id,
     p.proveedor_id,
     p.usuario_id,
@@ -391,7 +392,7 @@ FROM
         INNER JOIN
     usuarios pr ON p.proveedor_id = pr.usuario_id
         LEFT JOIN
-    pedidos_detalles pd ON p.pedido_id = p.pedido_id
+    pedidos_detalles pd ON pd.pedido_id = p.pedido_id
         INNER JOIN
     productos o ON o.producto_id = pd.producto_id ' .
         (($all == 'false') ? 'WHERE p.fecha_entrega = "0000-00-00 00:00:00"' : '')
@@ -414,7 +415,9 @@ FROM
     pd.cantidad,
     pd.precio_unidad,
     pd.precio_total,
-    o.nombre;');
+    o.nombre;';
+
+    $results = $db->rawQuery($SQL);
 
 
     $final = array();
@@ -441,16 +444,18 @@ FROM
         if ($row["pedido_detalle_id"] !== null) {
 
             if (sizeof($final[$row['pedido_id']]['pedidos_detalles']) > 0) {
-                foreach ($final[$row['pedido_id']]['pedidodetalles'] as $pde) {
+                foreach ($final[$row['pedido_id']]['pedidos_detalles'] as $pde) {
                     if ($pde['pedido_detalle_id'] == $row["pedido_detalle_id"]) {
                         $have_pde = true;
                     }
                 }
             } else {
                 $final[$row['pedido_id']]['pedidos_detalles'][] = array(
-                    'pedido_detalle_id' => $row['pedido_detalle_id'],
-                    'nombre' => $row['nombrePedidodetalle'],
-                    'parent_id' => $row['parent_id']
+                    'pedidodetalle_id' => $row['pedido_detalle_id'],
+                    'cantidad' => $row['cantidad'],
+                    'precio_unidad' => $row['precio_unidad'],
+                    'precio_total' => $row['precio_total'],
+                    'nombre' => $row['nombreProducto']
                 );
 
                 $have_pde = true;
@@ -458,7 +463,7 @@ FROM
 
             if (!$have_pde) {
                 array_push($final[$row['pedido_id']]['pedidodetalles'], array(
-                    'pedidodetalle_id' => $row['pedidodetalle_id'],
+                    'pedido_detalle_id' => $row['pedido_detalle_id'],
                     'cantidad' => $row['cantidad'],
                     'precio_unidad' => $row['precio_unidad'],
                     'precio_total' => $row['precio_total'],
