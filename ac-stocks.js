@@ -272,7 +272,7 @@
 
         /**
          * @description Retorna la lista filtrada de pedidos
-         * @param param -> String, separado por comas (,) que contiene la lista de parï¿½metros de bï¿½squeda, por ej: nombre, sku
+         * @param param -> String, separado por comas (,) que contiene la lista de parámetros de básqueda, por ej: nombre, sku
          * @param value
          * @param callback
          */
@@ -369,33 +369,33 @@
         }
 
         /**
-         * Para el uso de la pï¿½ginaciï¿½n, definir en el controlador las siguientes variables:
+         * Para el uso de la páginacián, definir en el controlador las siguientes variables:
          *
          vm.start = 0;
          vm.pagina = PedidoVars.pagina;
-         PedidoVars.paginacion = 5; Cantidad de registros por pï¿½gina
+         PedidoVars.paginacion = 5; Cantidad de registros por página
          vm.end = PedidoVars.paginacion;
 
 
          En el HTML, en el ng-repeat agregar el siguiente filtro: limitTo:appCtrl.end:appCtrl.start;
 
-         Agregar un botï¿½n de next:
+         Agregar un botán de next:
          <button ng-click="appCtrl.next()">next</button>
 
-         Agregar un botï¿½n de prev:
+         Agregar un botán de prev:
          <button ng-click="appCtrl.prev()">prev</button>
 
-         Agregar un input para la pï¿½gina:
+         Agregar un input para la página:
          <input type="text" ng-keyup="appCtrl.goToPagina()" ng-model="appCtrl.pagina">
 
          */
 
 
         /**
-         * @description: Ir a pï¿½gina
+         * @description: Ir a página
          * @param pagina
          * @returns {*}
-         * uso: agregar un mï¿½todo
+         * uso: agregar un mátodo
          vm.goToPagina = function () {
                 vm.start= PedidoService.goToPagina(vm.pagina).start;
             };
@@ -420,7 +420,7 @@
 
         /**
          * @name next
-         * @description Ir a prï¿½xima pï¿½gina
+         * @description Ir a práxima página
          * @returns {*}
          * uso agregar un metodo
          vm.next = function () {
@@ -441,9 +441,9 @@
 
         /**
          * @name previous
-         * @description Ir a pï¿½gina anterior
+         * @description Ir a página anterior
          * @returns {*}
-         * uso, agregar un mï¿½todo
+         * uso, agregar un mátodo
          vm.prev = function () {
                 vm.start= PedidoService.prev().start;
                 vm.pagina = PedidoVars.pagina;
@@ -471,19 +471,19 @@
      * @constructor
      */
     function PedidoVars() {
-        // Cantidad de pï¿½ginas total del recordset
+        // Cantidad de páginas total del recordset
         this.paginas = 1;
-        // Pï¿½gina seleccionada
+        // Página seleccionada
         this.pagina = 1;
-        // Cantidad de registros por pï¿½gina
+        // Cantidad de registros por página
         this.paginacion = 10;
-        // Registro inicial, no es pï¿½gina, es el registro
+        // Registro inicial, no es página, es el registro
         this.start = 0;
 
 
         // Indica si debe traer todos los pedidos o solo los activos, por defecto, solo los activos
         this.all = false;
-        // Indica si se debe limpiar el cachï¿½ la prï¿½xima vez que se solicite un get
+        // Indica si se debe limpiar el cachá la práxima vez que se solicite un get
         this.clearCache = true;
 
     }
@@ -667,7 +667,7 @@
 
         /**
          * @description Retorna la lista filtrada de stocks
-         * @param param -> String, separado por comas (,) que contiene la lista de parï¿½metros de bï¿½squeda, por ej: nombre, sku
+         * @param param -> String, separado por comas (,) que contiene la lista de parámetros de básqueda, por ej: nombre, sku
          * @param value
          * @param callback
          */
@@ -705,10 +705,9 @@
          * @returns {*}
          */
         function create(stock, callback) {
-
             return $http.post(url,
                 {
-                    'function': 'createCategoria',
+                    'function': 'createStock',
                     'stock': JSON.stringify(stock)
                 })
                 .success(function (data) {
@@ -743,33 +742,33 @@
         }
 
         /**
-         * Para el uso de la pï¿½ginaciï¿½n, definir en el controlador las siguientes variables:
+         * Para el uso de la páginacián, definir en el controlador las siguientes variables:
          *
          vm.start = 0;
          vm.pagina = StockVars.pagina;
-         StockVars.paginacion = 5; Cantidad de registros por pï¿½gina
+         StockVars.paginacion = 5; Cantidad de registros por página
          vm.end = StockVars.paginacion;
 
 
          En el HTML, en el ng-repeat agregar el siguiente filtro: limitTo:appCtrl.end:appCtrl.start;
 
-         Agregar un botï¿½n de next:
+         Agregar un botán de next:
          <button ng-click="appCtrl.next()">next</button>
 
-         Agregar un botï¿½n de prev:
+         Agregar un botán de prev:
          <button ng-click="appCtrl.prev()">prev</button>
 
-         Agregar un input para la pï¿½gina:
+         Agregar un input para la página:
          <input type="text" ng-keyup="appCtrl.goToPagina()" ng-model="appCtrl.pagina">
 
          */
 
 
         /**
-         * @description: Ir a pï¿½gina
+         * @description: Ir a página
          * @param pagina
          * @returns {*}
-         * uso: agregar un mï¿½todo
+         * uso: agregar un mátodo
          vm.goToPagina = function () {
                 vm.start= StockService.goToPagina(vm.pagina).start;
             };
@@ -794,7 +793,7 @@
 
         /**
          * @name next
-         * @description Ir a prï¿½xima pï¿½gina
+         * @description Ir a próxima página
          * @returns {*}
          * uso agregar un metodo
          vm.next = function () {
@@ -815,9 +814,9 @@
 
         /**
          * @name previous
-         * @description Ir a pï¿½gina anterior
+         * @description Ir a página anterior
          * @returns {*}
-         * uso, agregar un mï¿½todo
+         * uso, agregar un método
          vm.prev = function () {
                 vm.start= StockService.prev().start;
                 vm.pagina = StockVars.pagina;
@@ -845,19 +844,19 @@
      * @constructor
      */
     function StockVars() {
-        // Cantidad de pï¿½ginas total del recordset
+        // Cantidad de páginas total del recordset
         this.paginas = 1;
-        // Pï¿½gina seleccionada
+        // Página seleccionada
         this.pagina = 1;
-        // Cantidad de registros por pï¿½gina
+        // Cantidad de registros por página
         this.paginacion = 10;
-        // Registro inicial, no es pï¿½gina, es el registro
+        // Registro inicial, no es página, es el registro
         this.start = 0;
 
         // Variable que regristra si se traen todos los stocks o solos los mayores a 0
         this.reducido = true;
 
-        // Indica si se debe limpiar el cachï¿½ la prï¿½xima vez que se solicite un get
+        // Indica si se debe limpiar el cachá la práxima vez que se solicite un get
         this.clearCache = true;
 
     }

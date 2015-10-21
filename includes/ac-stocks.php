@@ -148,18 +148,18 @@ function createPedido($pedido)
 function createStock($stock, $db)
 {
 
-    $item_decoded = checkPedidodetalle($stock);
+    $item_decoded = checkStock($stock);
 
     $data = array(
         'producto_id' => $item_decoded->producto_id,
         'proveedor_id' => $item_decoded->proveedor_id,
         'sucursal_id' => $item_decoded->sucursal_id,
         'cant_actual' => $item_decoded->cant_actual,
-        'cant_total' => $item_decoded->cant_total,
+        'cant_inicial' => $item_decoded->cant_inicial,
         'costo_uni' => $item_decoded->precio_unidad
     );
 
-    $result = $db->insert('pedidodetalles', $data);
+    $result = $db->insert('stock', $data);
 
     return $result;
 }
@@ -706,7 +706,7 @@ function checkStock($stock)
     $stock->producto_id = (!array_key_exists("producto_id", $stock)) ? -1 : $stock->producto_id;
     $stock->sucursal_id = (!array_key_exists("sucursal_id", $stock)) ? 0 : $stock->sucursal_id;
     $stock->cant_actual = (!array_key_exists("cant_actual", $stock)) ? 0.0 : $stock->cant_actual;
-    $stock->cant_total = (!array_key_exists("cant_total", $stock)) ? 0.0 : $stock->cant_total;
+    $stock->cant_inicial = (!array_key_exists("cant_inicial", $stock)) ? 0.0 : $stock->cant_inicial;
     $stock->costo_uni = (!array_key_exists("costo_uni", $stock)) ? 0.0 : $stock->costo_uni;
 
     return $stock;
