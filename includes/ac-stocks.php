@@ -518,11 +518,12 @@ function getStocks($reducido)
 {
     $db = new MysqliDb();
     //    $results = $db->get('pedidos');
-    $results = $db->rawQuery('SELECT
+    $SQL = 'SELECT
     p.stock_id,
     p.producto_id,
     p.proveedor_id,
     p.sucursal_id,
+    s.nombre nombreSucursal,
     p.fecha_compra,
     p.cant_actual,
     p.cant_inicial,
@@ -549,7 +550,9 @@ FROM
     precios pe ON o.producto_id = pe.producto_id
         LEFT JOIN
     productos_kits pi ON o.producto_id = pi.parent_id
-    ' . (($reducido) ? ' WHERE p.cant_actual > 0 ' : '') . '
+        LEFT JOIN
+    sucursales s on p.sucursal_id = s.sucursal_id
+    ' . (($reducido == 'true') ? ' WHERE p.cant_actual > 0 ' : '') . '
 GROUP BY p.stock_id,
     p.producto_id,
     p.proveedor_id,
@@ -569,7 +572,9 @@ GROUP BY p.stock_id,
     pe.precio,
     pi.producto_kit_id,
     pi.producto_id,
-    pi.producto_cantidad;');
+    pi.producto_cantidad;';
+
+    $results = $db->rawQuery($SQL);
 
 
     $final = array();
@@ -581,6 +586,7 @@ GROUP BY p.stock_id,
                 'producto_id' => $row["producto_id"],
                 'proveedor_id' => $row["proveedor_id"],
                 'sucursal_id' => $row["sucursal_id"],
+                'nombreSucursal' => $row["nombreSucursal"],
                 'fecha_compra' => $row["fecha_compra"],
                 'cant_actual' => $row["cant_actual"],
                 'cant_inicial' => $row["cant_inicial"],
