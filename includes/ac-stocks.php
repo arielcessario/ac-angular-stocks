@@ -43,7 +43,7 @@ if ($decoded != null) {
     if ($decoded->function == 'createPedido') {
         createPedido($decoded->pedido);
     } else if ($decoded->function == 'createPedidoDetalle') {
-        createPedidoDetalle($decoded->pedido´_detalle);
+        createPedidoDetalle($decoded->pedido_detalle);
     } else if ($decoded->function == 'createStock') {
 
         // Siempre que se envía un stock, debería ser una lista de productos para guardar, por lo cual es mejor hacerlo desde el lado del servidor.

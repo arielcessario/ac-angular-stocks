@@ -506,6 +506,7 @@
         service.aReponer = aReponer;
         service.trasladar = trasladar; // Por performance es mejor hacer en el php
         service.getDisponibles = getDisponibles;
+        service.getFraccionables = getFraccionables;
 
         service.remove = remove;
 
@@ -517,6 +518,29 @@
         return service;
 
         //Functions
+        /**
+         * @description Retorna los productos que son fraccionables
+         * @param callback
+         */
+        function getFraccionables(callback) {
+
+            get(function (data) {
+                var response = [];
+                if (data.length > 0) {
+                    response = data.filter(function (element, index, array) {
+
+                        if (parseInt(element.producto_tipo) == 4 && parseInt(element.cant_actual) > 0) {
+                            return element;
+                        }
+                    });
+                }
+
+                callback(response);
+            })
+        }
+
+
+
         function getDisponibles(sucursal_id, nombreProducto, callback) {
 
             get(function (data) {
