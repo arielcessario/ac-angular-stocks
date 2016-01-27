@@ -753,7 +753,7 @@
         function update(stock, callback) {
             return $http.post(url,
                 {
-                    'function': 'updateCategoria',
+                    'function': 'updateStock',
                     'stock': JSON.stringify(stock)
                 })
                 .success(function (data) {

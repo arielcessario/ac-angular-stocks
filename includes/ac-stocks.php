@@ -43,7 +43,7 @@ if ($decoded != null) {
     if ($decoded->function == 'createPedido') {
         createPedido($decoded->pedido);
     } else if ($decoded->function == 'createPedidoDetalle') {
-        createPedidoDetalle($decoded->pedido_detalle);
+        createPedidoDetalle($decoded->pedido´_detalle);
     } else if ($decoded->function == 'createStock') {
 
         // Siempre que se envía un stock, debería ser una lista de productos para guardar, por lo cual es mejor hacerlo desde el lado del servidor.
@@ -288,12 +288,7 @@ function updateStock($stock)
     $db->startTransaction();
     $item_decoded = checkStock(json_decode($stock));
     $db->where('stock_id', $item_decoded->stock_id);
-    $data = array(
-        'status' => $item_decoded->status,
-        'total' => $item_decoded->total,
-        'fecha' => $item_decoded->fecha,
-        'usuario_id' => $item_decoded->usuario_id
-    );
+    $data = array('cant_actual' => $item_decoded->cant_actual);
 
     $result = $db->update('stock', $data);
     if ($result) {
